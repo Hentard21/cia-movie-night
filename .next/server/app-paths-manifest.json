@@ -1,0 +1,5 @@
+{
+  "/api/suggestions/[id]/approve/route": "app/api/suggestions/[id]/approve/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js"
+}
