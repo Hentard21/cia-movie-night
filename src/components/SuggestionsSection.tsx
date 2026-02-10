@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Plus, Link2, Loader2, ThumbsUp, CheckCheck } from "lucide-react";
+import { Plus, Link2, Loader2, ThumbsUp, CheckCheck, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/contexts/UserContext";
 import type { Suggestion } from "@/lib/supabase/types";
+import { MovieModal } from "@/components/MovieModal";
 
 type SuggestionWithLikes = Suggestion & { like_count: number };
 
@@ -216,6 +217,7 @@ function SuggestionCardInner({
   const { user } = useUser();
   const [likeLoading, setLikeLoading] = useState(false);
   const [approveLoading, setApproveLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   async function handleLike() {
     if (!user) return;
@@ -249,10 +251,23 @@ function SuggestionCardInner({
   }
 
   return (
-    <motion.article
+    <>
+      <MovieModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        movie={{
+          title: suggestion.title,
+          poster_url: suggestion.poster_url ?? null,
+          plot: suggestion.plot ?? null,
+          imdb_rating: suggestion.imdb_rating ?? null,
+        }}
+      />
+
+      <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl bg-white overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.1)] transition-shadow"
+      onClick={() => setModalOpen(true)}
     >
       <div className="aspect-[2/3] relative bg-[#F5F5F7]">
         {suggestion.poster_url ? (
@@ -272,6 +287,23 @@ function SuggestionCardInner({
           <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-lg bg-black/50 backdrop-blur-sm text-amber-500 text-[10px] font-medium">
             ★ {suggestion.imdb_rating}
           </div>
+        )}
+
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!window.confirm("Delete this movie?")) return;
+              const supabase = createClient();
+              await supabase.from("suggestions").delete().eq("id", suggestion.id);
+              router.refresh();
+            }}
+            className="absolute top-1.5 left-1.5 p-2 rounded-xl bg-white/85 hover:bg-white text-red-600 transition shadow-sm"
+            aria-label="Delete suggestion"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         )}
       </div>
       <div className="p-2.5">
@@ -304,6 +336,7 @@ function SuggestionCardInner({
           )}
         </div>
       </div>
-    </motion.article>
+      </motion.article>
+    </>
   );
 }

@@ -37,7 +37,7 @@ export function MainContent({
     : new Set<string>();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F5F7]">
+    <div className="min-h-screen flex flex-col bg-[#F5F5F7] overflow-x-hidden w-full">
       <Navbar />
       <VideoHero />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">

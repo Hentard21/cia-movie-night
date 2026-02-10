@@ -3,9 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, ChevronDown, ChevronUp, Languages, Loader2 } from "lucide-react";
+import { Info, ChevronUp, Languages, Loader2, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/contexts/UserContext";
 import { VoteButton } from "./VoteButton";
 import type { MovieWithVotes } from "@/lib/supabase/types";
+import { MovieModal } from "@/components/MovieModal";
 
 export function MovieCard({
   movie,
@@ -18,9 +22,14 @@ export function MovieCard({
   isVoted: boolean;
   totalVotes: number;
 }) {
+  const router = useRouter();
+  const { isAdmin } = useUser();
+  const supabase = createClient();
+
   const [plotExpanded, setPlotExpanded] = useState(false);
   const [translatedPlot, setTranslatedPlot] = useState<string | null>(null);
   const [translating, setTranslating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const percentage = movie.percentage ?? 0;
   const hasPlot = !!movie.plot?.trim();
@@ -42,11 +51,24 @@ export function MovieCard({
   }
 
   return (
-    <motion.article
+    <>
+      <MovieModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        movie={{
+          title: movie.title,
+          poster_url: movie.poster_url ?? null,
+          plot: movie.plot ?? null,
+          imdb_rating: movie.imdb_rating ?? null,
+        }}
+      />
+
+      <motion.article
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: rank * 0.05 }}
-      className="rounded-[24px] bg-white overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-shadow"
+      className="rounded-[24px] bg-white overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer"
+      onClick={() => setModalOpen(true)}
     >
       <div className="aspect-[2/3] relative bg-[#F5F5F7]">
         {movie.poster_url ? (
@@ -67,6 +89,22 @@ export function MovieCard({
             ★ {movie.imdb_rating}
           </div>
         )}
+
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!window.confirm("Delete this movie?")) return;
+              await supabase.from("movies").delete().eq("id", movie.id);
+              router.refresh();
+            }}
+            className="absolute top-2 left-2 p-2 rounded-2xl bg-white/85 hover:bg-white text-red-600 transition shadow-sm"
+            aria-label="Delete movie"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
@@ -74,7 +112,10 @@ export function MovieCard({
           {hasPlot && (
             <button
               type="button"
-              onClick={() => setPlotExpanded(!plotExpanded)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setPlotExpanded(!plotExpanded);
+              }}
               className="flex-shrink-0 p-1.5 rounded-xl text-[#007AFF] hover:bg-[#007AFF]/10 transition"
               aria-label={plotExpanded ? "Hide plot" : "Read more"}
             >
@@ -112,7 +153,10 @@ export function MovieCard({
                 </p>
                 <button
                   type="button"
-                  onClick={handleTranslate}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTranslate();
+                  }}
                   disabled={translating}
                   className="mt-2 flex items-center gap-1.5 text-sm text-[#007AFF] hover:underline disabled:opacity-50"
                 >
@@ -137,8 +181,11 @@ export function MovieCard({
           />
         </div>
         <p className="text-xs text-[#86868b] mt-1">{percentage}% of votes</p>
-        <VoteButton movieId={movie.id} isVoted={isVoted} />
+        <div onClick={(e) => e.stopPropagation()}>
+          <VoteButton movieId={movie.id} isVoted={isVoted} />
+        </div>
       </div>
-    </motion.article>
+      </motion.article>
+    </>
   );
 }

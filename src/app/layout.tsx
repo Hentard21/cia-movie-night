@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased min-h-screen bg-[#F5F5F7] text-[#1d1d1f] font-sans">
+    <html lang="en" className="overflow-x-hidden">
+      <body className="antialiased min-h-screen bg-[#F5F5F7] text-[#1d1d1f] font-sans overflow-x-hidden max-w-[100vw]">
         <UserProvider>
           <AuthGuard>{children}</AuthGuard>
         </UserProvider>
