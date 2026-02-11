@@ -18,6 +18,14 @@ export async function POST(
     return NextResponse.json({ error: "Suggestion not found" }, { status: 404 });
   }
 
+  const { count } = await supabase.from("movies").select("id", { count: "exact", head: true });
+  if ((count ?? 0) >= 5) {
+    return NextResponse.json(
+      { error: "Only 5 films can be in the final vote. Remove one first." },
+      { status: 400 }
+    );
+  }
+
   const { error: insertErr } = await supabase.from("movies").insert({
     imdb_id: suggestion.imdb_id,
     title: suggestion.title,

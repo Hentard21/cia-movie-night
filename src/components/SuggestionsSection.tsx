@@ -15,9 +15,11 @@ type SuggestionWithLikes = Suggestion & { like_count: number };
 export function SuggestionsSection({
   suggestions,
   myLikedSuggestionIds,
+  canSuggest = true,
 }: {
   suggestions: SuggestionWithLikes[];
   myLikedSuggestionIds: Set<string>;
+  canSuggest?: boolean;
 }) {
   const router = useRouter();
   const { user, isAdmin } = useUser();
@@ -89,15 +91,24 @@ export function SuggestionsSection({
     <section className="mb-12">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-[#1d1d1f]">Suggestions</h2>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setOpen(true)}
-          className="rounded-2xl px-4 py-2.5 flex items-center gap-2 bg-[#007AFF] text-white text-sm font-medium hover:bg-[#0051D5] transition shadow-[0_2px_8px_rgba(0,122,255,0.35)]"
-        >
-          <Plus className="w-4 h-4" />
-          Suggest a movie
-        </motion.button>
+        {canSuggest ? (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setOpen(true)}
+            className="rounded-2xl px-4 py-2.5 flex items-center gap-2 bg-[#007AFF] text-white text-sm font-medium hover:bg-[#0051D5] transition shadow-[0_2px_8px_rgba(0,122,255,0.35)]"
+          >
+            <Plus className="w-4 h-4" />
+            Suggest a movie
+          </motion.button>
+        ) : (
+          <a
+            href="/welcome"
+            className="rounded-2xl px-4 py-2.5 flex items-center gap-2 bg-[#F5F5F7] border border-[#d2d2d7] text-[#86868b] text-sm font-medium"
+          >
+            Sign in to suggest
+          </a>
+        )}
       </div>
 
       <div className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 -mx-4 px-4 scroll-smooth snap-x snap-mandatory [scrollbar-width:thin]">

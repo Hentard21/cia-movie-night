@@ -34,7 +34,7 @@ export function QuizSection() {
         user_id: user.id,
         q1: answers.q1!,
         q2: answers.q2!,
-        q3: answers.q3!,
+        q3: "none",
         q4: answers.q4!,
         q5: answers.q5!,
       },
@@ -80,7 +80,7 @@ export function QuizSection() {
             exit={{ opacity: 0 }}
             className="rounded-[24px] bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
           >
-            <p className="text-sm text-[#86868b] mb-6">5 quick questions — tap your choice for each.</p>
+            <p className="text-sm text-[#86868b] mb-6">4 quick questions — tap your choice for each.</p>
             <div className="space-y-6">
               {QUIZ_QUESTIONS.map((q) => (
                 <div key={q.id}>

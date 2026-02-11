@@ -43,12 +43,21 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-2xl bg-[#F5F5F7] border border-[#d2d2d7]/60 min-w-0 max-w-[90px] sm:max-w-[140px] md:max-w-[160px] overflow-hidden">
-            <User className="w-4 h-4 text-[#86868b] flex-shrink-0" />
-            <span className="text-sm text-[#1d1d1f] truncate">
-              {user?.full_name} · {user?.course} {user?.level}
-            </span>
-          </div>
+          {user ? (
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-2xl bg-[#F5F5F7] border border-[#d2d2d7]/60 min-w-0 max-w-[90px] sm:max-w-[140px] md:max-w-[160px] overflow-hidden">
+              <User className="w-4 h-4 text-[#86868b] flex-shrink-0" />
+              <span className="text-sm text-[#1d1d1f] truncate">
+                {user.full_name} · {user.course} {user.level}
+              </span>
+            </div>
+          ) : (
+            <Link
+              href="/welcome"
+              className="px-3 py-2 rounded-2xl text-sm font-medium text-[#007AFF] hover:bg-[#007AFF]/10 transition"
+            >
+              Sign in to vote
+            </Link>
+          )}
 
           {!isAdmin ? (
             <button
@@ -78,41 +87,67 @@ export function Navbar() {
             </>
           )}
 
-          <button
-            onClick={handleSignOut}
-            className="p-2 rounded-2xl text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#F5F5F7] transition flex-shrink-0"
-            aria-label="Sign out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          {user ? (
+            <button
+              onClick={handleSignOut}
+              className="p-2 rounded-2xl text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#F5F5F7] transition flex-shrink-0"
+              aria-label="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          ) : null}
         </div>
       </div>
 
       {showAdminInput && (
-        <form
-          onSubmit={handleAdminSubmit}
-          className="absolute top-full right-4 mt-1 p-3 rounded-2xl bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-[#d2d2d7] flex gap-2"
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40"
+          onClick={() => {
+            setShowAdminInput(false);
+            setAdminError(false);
+          }}
+          role="dialog"
+          aria-label="Admin login"
         >
-          <input
-            type="password"
-            value={adminPassword}
-            onChange={(e) => {
-              setAdminPassword(e.target.value);
-              setAdminError(false);
-            }}
-            placeholder="Admin password"
-            className="px-3 py-2 rounded-xl border border-[#d2d2d7] text-sm focus:outline-none focus:border-[#007AFF]"
-          />
-          <button
-            type="submit"
-            className="px-3 py-2 rounded-xl bg-[#007AFF] text-white text-sm font-medium"
+          <form
+            onSubmit={handleAdminSubmit}
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-2xl bg-white p-4 shadow-xl border border-[#d2d2d7] flex flex-col sm:flex-row gap-3 min-w-[260px]"
           >
-            Unlock
-          </button>
-          {adminError && (
-            <p className="text-red-500 text-xs absolute -bottom-5 left-0">Wrong password</p>
-          )}
-        </form>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => {
+                setAdminPassword(e.target.value);
+                setAdminError(false);
+              }}
+              placeholder="Admin password"
+              className="px-3 py-2 rounded-xl border border-[#d2d2d7] text-sm focus:outline-none focus:border-[#007AFF] flex-1"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAdminInput(false);
+                  setAdminError(false);
+                }}
+                className="px-3 py-2 rounded-xl border border-[#d2d2d7] text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-3 py-2 rounded-xl bg-[#007AFF] text-white text-sm font-medium"
+              >
+                Unlock
+              </button>
+            </div>
+            {adminError && (
+              <p className="text-red-500 text-xs">Wrong password</p>
+            )}
+          </form>
+        </div>
       )}
     </header>
   );

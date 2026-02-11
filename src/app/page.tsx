@@ -13,7 +13,7 @@ export default async function HomePage() {
   ] = await Promise.all([
     supabase
       .from("movies")
-      .select("id, title, poster_url, imdb_id, year, director, plot, genre, imdb_rating, pedagogical_note, added_by")
+      .select("id, title, poster_url, imdb_id, year, director, plot, genre, imdb_rating, pedagogical_note, added_by, winner_at")
       .order("created_at", { ascending: false }),
     supabase.from("votes").select("movie_id, user_id"),
     supabase
@@ -41,6 +41,9 @@ export default async function HomePage() {
     percentage: totalVotes > 0 ? Math.round(((voteCountByMovie[m.id] ?? 0) / totalVotes) * 100) : 0,
   }));
 
+  const winnerMovie = (movies ?? []).find((m) => (m as { winner_at?: string | null }).winner_at);
+  const winnerMovieId = winnerMovie?.id ?? null;
+
   const suggestionsWithLikes = (suggestions ?? []).map((s) => ({
     ...s,
     like_count: likeCountBySuggestion[s.id] ?? 0,
@@ -54,6 +57,7 @@ export default async function HomePage() {
       suggestions={suggestionsWithLikes}
       suggestionLikes={suggestionLikes ?? []}
       voterProfiles={voterProfiles ?? []}
+      winnerMovieId={winnerMovieId}
     />
   );
 }

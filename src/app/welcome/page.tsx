@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Film, User, BookOpen, BarChart3 } from "lucide-react";
+import { Film, User, BookOpen, BarChart3, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
 const COURSES = ["ELS", "IELTS", "Business", "TOEFL"] as const;
@@ -34,7 +35,14 @@ export default function WelcomePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#F5F5F7]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#F5F5F7] relative">
+      <Link
+        href="/"
+        className="absolute top-4 right-4 p-2 rounded-2xl text-[#86868b] hover:bg-white hover:text-[#1d1d1f] transition z-10"
+        aria-label="Skip registration"
+      >
+        <X className="w-6 h-6" />
+      </Link>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,7 +58,7 @@ export default function WelcomePage() {
           </span>
         </div>
         <p className="text-[#86868b] text-sm mb-6">
-          Enter your details to join the vote.
+          Enter your details to vote and suggest films. You can skip and browse only.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">

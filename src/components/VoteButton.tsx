@@ -7,7 +7,15 @@ import { Check, Vote } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/contexts/UserContext";
 
-export function VoteButton({ movieId, isVoted }: { movieId: string; isVoted: boolean }) {
+export function VoteButton({
+  movieId,
+  isVoted,
+  disabled,
+}: {
+  movieId: string;
+  isVoted: boolean;
+  disabled?: boolean;
+}) {
   const router = useRouter();
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
@@ -27,7 +35,7 @@ export function VoteButton({ movieId, isVoted }: { movieId: string; isVoted: boo
   }
 
   async function handleVote() {
-    if (!user) return;
+    if (!user || disabled) return;
     setLoading(true);
     const supabase = createClient();
     await ensureVoterProfile();
@@ -46,7 +54,7 @@ export function VoteButton({ movieId, isVoted }: { movieId: string; isVoted: boo
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleVote}
-      disabled={loading}
+      disabled={loading || disabled}
       className={`mt-3 w-full py-2.5 rounded-2xl text-sm font-medium flex items-center justify-center gap-2 transition disabled:opacity-50 ${
         isVoted
           ? "bg-[#007AFF] text-white shadow-[0_2px_8px_rgba(0,122,255,0.35)]"

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, ChevronUp, Languages, Loader2, Trash2 } from "lucide-react";
+import { Info, ChevronUp, Languages, Loader2, Trash2, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/contexts/UserContext";
@@ -16,14 +16,27 @@ export function MovieCard({
   rank,
   isVoted,
   totalVotes,
+  isWinner,
+  votingClosed,
+  canVote = true,
+  isAdmin,
+  onDeclareWinner,
+  compact,
 }: {
   movie: MovieWithVotes;
   rank: number;
   isVoted: boolean;
   totalVotes: number;
+  isWinner?: boolean;
+  votingClosed?: boolean;
+  canVote?: boolean;
+  isAdmin?: boolean;
+  onDeclareWinner?: () => void;
+  compact?: boolean;
 }) {
   const router = useRouter();
-  const { isAdmin } = useUser();
+  const { isAdmin: ctxAdmin } = useUser();
+  const admin = isAdmin ?? ctxAdmin;
   const supabase = createClient();
 
   const [plotExpanded, setPlotExpanded] = useState(false);
@@ -90,7 +103,16 @@ export function MovieCard({
           </div>
         )}
 
-        {isAdmin && (
+        {isWinner && (
+          <div className="absolute top-2 left-2 right-2 flex justify-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400/95 text-black text-xs font-semibold">
+              <Trophy className="w-4 h-4" />
+              Winner
+            </span>
+          </div>
+        )}
+
+        {admin && !isWinner && (
           <button
             type="button"
             onClick={async (e) => {
@@ -181,9 +203,27 @@ export function MovieCard({
           />
         </div>
         <p className="text-xs text-[#86868b] mt-1">{percentage}% of votes</p>
-        <div onClick={(e) => e.stopPropagation()}>
-          <VoteButton movieId={movie.id} isVoted={isVoted} />
-        </div>
+        {!isWinner && (
+          <div onClick={(e) => e.stopPropagation()} className="space-y-2">
+            <VoteButton
+              movieId={movie.id}
+              isVoted={isVoted}
+              disabled={votingClosed || !canVote}
+            />
+            {admin && onDeclareWinner && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeclareWinner();
+                }}
+                className="w-full py-2 rounded-2xl text-sm font-medium border border-amber-400/60 text-amber-700 bg-amber-50 hover:bg-amber-100 transition"
+              >
+                Declare winner
+              </button>
+            )}
+          </div>
+        )}
       </div>
       </motion.article>
     </>

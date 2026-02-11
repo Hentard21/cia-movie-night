@@ -18,6 +18,7 @@ export type Movie = {
   imdb_rating: string | null;
   added_by: string | null;
   pedagogical_note: string | null;
+  winner_at: string | null;
   created_at?: string;
 };
 

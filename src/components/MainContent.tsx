@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { VideoHero } from "@/components/VideoHero";
 import { Hero } from "@/components/Hero";
 import { SuggestionsSection } from "@/components/SuggestionsSection";
-import { MovieGrid } from "@/components/MovieGrid";
+import { FinalVoteSection } from "@/components/FinalVoteSection";
 import { Leaderboard } from "@/components/Leaderboard";
 import { QuizSection } from "@/components/QuizSection";
 import type { MovieWithVotes } from "@/lib/supabase/types";
@@ -22,6 +22,7 @@ export function MainContent({
   suggestions,
   suggestionLikes,
   voterProfiles,
+  winnerMovieId,
 }: {
   movies: MovieWithVotes[];
   totalVotes: number;
@@ -29,8 +30,9 @@ export function MainContent({
   suggestions: (Suggestion & { like_count: number })[];
   suggestionLikes: SuggestionLikeRow[];
   voterProfiles: VoterProfileRow[];
+  winnerMovieId: string | null;
 }) {
-  const { user } = useUser();
+  const { user, isAdmin } = useUser();
   const myVoteMovieId = user ? votes.find((v) => v.user_id === user.id)?.movie_id ?? null : null;
   const myLikedSuggestionIds = user
     ? new Set(suggestionLikes.filter((l) => l.user_id === user.id).map((l) => l.suggestion_id))
@@ -39,21 +41,26 @@ export function MainContent({
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F5F7] overflow-x-hidden w-full">
       <Navbar />
+      {!user && (
+        <div className="bg-[#007AFF]/10 border-b border-[#007AFF]/20 px-4 py-2.5 text-center text-sm text-[#007AFF]">
+          <a href="/welcome" className="underline font-medium">Sign in</a> to vote and suggest films.
+        </div>
+      )}
       <VideoHero />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
         <Hero />
         <SuggestionsSection
           suggestions={suggestions}
           myLikedSuggestionIds={myLikedSuggestionIds}
+          canSuggest={!!user}
         />
-        <section className="mt-12">
-          <h2 className="text-xl font-semibold text-[#1d1d1f] mb-4">Final Voting</h2>
-          <MovieGrid
-            movies={movies}
-            totalVotes={totalVotes}
-            myVoteMovieId={myVoteMovieId}
-          />
-        </section>
+        <FinalVoteSection
+          movies={movies}
+          totalVotes={totalVotes}
+          myVoteMovieId={myVoteMovieId}
+          winnerMovieId={winnerMovieId}
+          isAdmin={isAdmin}
+        />
         <QuizSection />
         <Leaderboard voterProfiles={voterProfiles} votes={votes} movies={movies} />
       </main>

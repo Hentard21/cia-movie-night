@@ -24,6 +24,7 @@ create table public.movies (
   imdb_rating text,
   added_by uuid references public.voter_profiles(id) on delete set null,
   pedagogical_note text,
+  winner_at timestamptz,
   created_at timestamptz default now()
 );
 
@@ -94,6 +95,8 @@ create policy "Voter profiles update" on public.voter_profiles for update using 
 -- Movies: everyone can read; anyone can insert (admin approves from UI)
 create policy "Movies select" on public.movies for select using (true);
 create policy "Movies insert" on public.movies for insert with check (true);
+create policy "Movies update" on public.movies for update using (true);
+create policy "Movies delete" on public.movies for delete using (true);
 
 -- Suggestions: everyone can read and insert
 create policy "Suggestions select" on public.suggestions for select using (true);

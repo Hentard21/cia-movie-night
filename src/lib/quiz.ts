@@ -19,15 +19,6 @@ export const QUIZ_QUESTIONS = [
     ],
   },
   {
-    id: "q3" as const,
-    label: "Prefer subtitles",
-    options: [
-      { value: "english", label: "English" },
-      { value: "russian", label: "Russian" },
-      { value: "none", label: "None" },
-    ],
-  },
-  {
     id: "q4" as const,
     label: "Film length",
     options: [
@@ -47,5 +38,5 @@ export const QUIZ_QUESTIONS = [
   },
 ] as const;
 
-export const Q_KEYS = ["q1", "q2", "q3", "q4", "q5"] as const;
+export const Q_KEYS = ["q1", "q2", "q4", "q5"] as const;
 export type QuizAnswers = Record<(typeof Q_KEYS)[number], string>;

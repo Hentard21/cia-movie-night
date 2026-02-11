@@ -1,3 +1,13 @@
 {
-  "/page": "app/page.js"
+  "/api/suggestions/[id]/approve/route": "app/api/suggestions/[id]/approve/route.js",
+  "/api/translate/route": "app/api/translate/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/api/admin/declare-winner/route": "app/api/admin/declare-winner/route.js",
+  "/api/omdb/route": "app/api/omdb/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/page": "app/page.js",
+  "/welcome/page": "app/welcome/page.js",
+  "/onboarding/page": "app/onboarding/page.js",
+  "/login/page": "app/login/page.js"
 }
